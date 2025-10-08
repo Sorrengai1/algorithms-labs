@@ -1,33 +1,29 @@
-def insertion_sort(data):
-    comparisons = assignments = 0
-    n = len(data)
+def selection_sort(arr):
+    n = len(arr)
+    comparisons = 0
+    assignments = 0
 
-    for i in range(1, n):
-        current = data[i]
-        j = i - 1
-        assignments += 2
-
-        while j >= 0 and data[j] > current:
-            comparisons += 1
-            data[j + 1] = data[j]
-            assignments += 1
-            j -= 1
-            assignments += 1
-
-        if j >= 0:
-            comparisons += 1
-
-        data[j + 1] = current
+    for i in range(n - 1):
+        min_index = i
         assignments += 1
 
-    return data, comparisons, assignments
+        for j in range(i + 1, n):
+            comparisons += 1
+            if arr[j] < arr[min_index]:
+                min_index = j
+                assignments += 1
+
+        comparisons += 1
+        if min_index != i:
+            arr[i], arr[min_index] = arr[min_index], arr[i]
+            assignments += 3
+
+    return arr, comparisons, assignments
 
 sequence = [11, 42, 67, 55, 65, 78, 25, 50, 69]
-
-print("***Сортування вставками***")
-sorted_insertion, comp_ins, assign_ins = insertion_sort(sequence.copy())
-print(f"Оригінал: {sequence}")
-print(f"Відсортовано: {sorted_insertion}")
-print(f"Порівнянь: {comp_ins}")
-print(f"Присвоєнь: {assign_ins}")
-print(f"Всього операцій: {comp_ins + assign_ins}")
+sorted_list, comps, assigns = selection_sort(sequence.copy())
+print("Оригінал:", sequence)
+print("Відсортовано:", sorted_list)
+print(f"Порівнянь: {comps}")
+print(f"Присвоєнь: {assigns}")
+print(f"Всього операцій: {comps + assigns}")
