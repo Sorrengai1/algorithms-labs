@@ -13,7 +13,6 @@ def selection_sort(arr):
                 min_index = j
                 assignments += 1
 
-        comparisons += 1
         if min_index != i:
             arr[i], arr[min_index] = arr[min_index], arr[i]
             assignments += 3
