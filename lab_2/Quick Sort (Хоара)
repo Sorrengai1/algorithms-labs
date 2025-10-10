@@ -1,0 +1,60 @@
+def quicksort_hoare(arr, low, high):
+
+    if low >= high:
+        return arr, 0, 0, 0  
+    
+    # Розділення
+    arr, pivot_index, comp_part, assign_part = partition_hoare(arr, low, high)
+    
+    # Рекурсивні виклики
+    arr, comp_left, assign_left, calls_left = quicksort_hoare(arr, low, pivot_index)
+    arr, comp_right, assign_right, calls_right = quicksort_hoare(arr, pivot_index + 1, high)
+    
+    total_comparisons = comp_part + comp_left + comp_right
+    total_assignments = assign_part + assign_left + assign_right
+    total_calls = 1 + calls_left + calls_right  
+    
+    return arr, total_comparisons, total_assignments, total_calls
+
+
+def partition_hoare(arr, low, high):
+    pivot = arr[low]
+    i = low - 1
+    j = high + 1
+    comparisons = 0
+    assignments = 3
+    
+    while True:
+        i += 1
+        assignments += 1
+        while arr[i] < pivot:
+            comparisons += 1
+            i += 1
+            assignments += 1
+        comparisons += 1  # останнє порівняння для виходу
+        
+        j -= 1
+        assignments += 1
+        while arr[j] > pivot:
+            comparisons += 1
+            j -= 1
+            assignments += 1
+        comparisons += 1  # останнє порівняння для виходу
+        
+        if i >= j:
+            return arr, j, comparisons, assignments
+        
+        # Обмін елементів
+        arr[i], arr[j] = arr[j], arr[i]
+        assignments += 3
+
+
+arr = [11, 42, 67, 55, 65, 78, 25, 50, 69]
+print("Оригінальний масив:", arr)
+
+sorted_arr, comparisons, assignments, recursive_calls = quicksort_hoare(arr, 0, len(arr) - 1)
+
+print("Відсортований масив:", sorted_arr)
+print("Порівнянь:", comparisons)
+print("Присвоювань:", assignments)
+print("Рекурсивних викликів:", recursive_calls)
