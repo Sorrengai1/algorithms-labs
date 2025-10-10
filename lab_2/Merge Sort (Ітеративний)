@@ -1,0 +1,76 @@
+def iterative_merge_sort(arr):
+
+    size = len(arr)
+    comp_count = 0
+    assign_count = 0
+    block_size = 1
+    
+    while block_size < size:
+        start = 0
+        while start < size - block_size:
+            left_start = start
+            middle = start + block_size
+            right_end = min(start + 2 * block_size, size)
+            
+            comp, assign = merge_arrays(arr, left_start, middle, right_end)
+            comp_count += comp
+            assign_count += assign
+            
+            start += 2 * block_size
+        block_size *= 2
+    
+    return arr, comp_count, assign_count
+
+def merge_arrays(arr, left, mid, right):
+
+    comp_ops = 0
+    assign_ops = 0
+    
+    left_size = mid - left
+    right_size = right - mid
+    
+    # Створюємо копії підмасивів
+    left_part = arr[left:mid]
+    right_part = arr[mid:right]
+    assign_ops += left_size + right_size
+    
+    # Ініціалізуємо індекси
+    left_idx, right_idx, main_idx = 0, 0, left
+    assign_ops += 3
+    
+    # Злиття з порівнянням елементів
+    while left_idx < left_size and right_idx < right_size:
+        comp_ops += 1
+        if left_part[left_idx] <= right_part[right_idx]:
+            arr[main_idx] = left_part[left_idx]
+            left_idx += 1
+        else:
+            arr[main_idx] = right_part[right_idx]
+            right_idx += 1
+        assign_ops += 1
+        main_idx += 1
+        assign_ops += 1
+    
+    # Додаємо залишкові елементи з лівого масиву
+    while left_idx < left_size:
+        arr[main_idx] = left_part[left_idx]
+        left_idx += 1
+        main_idx += 1
+        assign_ops += 1
+    
+    # Додаємо залишкові елементи з правого масиву
+    while right_idx < right_size:
+        arr[main_idx] = right_part[right_idx]
+        right_idx += 1
+        main_idx += 1
+        assign_ops += 1
+    
+    return comp_ops, assign_ops
+
+numbers = [11, 42, 67, 55, 65, 78, 25, 50, 69]
+print("Вхідний масив:", numbers)
+
+sorted_numbers, comparisons, assignments = iterative_merge_sort(numbers.copy())
+print("Відсортований масив:", sorted_numbers)
+print(f"Виконано порівнянь: {comparisons}")
+print(f"Виконано присвоювань: {assignments}")
