@@ -1,0 +1,72 @@
+def merge_sort_recursive(arr):
+  
+    if len(arr) <= 1:
+        return arr, 0, 0, 1  
+    
+    comp_count = 0
+    assign_count = 0
+    recursive_calls = 1  # поточний виклик
+    
+    mid = len(arr) // 2
+    
+    # Розділяємо масив на дві половини
+    left_arr = arr[:mid]
+    right_arr = arr[mid:]
+    assign_count += len(left_arr) + len(right_arr)
+    
+    # Рекурсивні виклики для лівої та правої половин
+    sorted_left, comp_left, assign_left, calls_left = merge_sort_recursive(left_arr)
+    sorted_right, comp_right, assign_right, calls_right = merge_sort_recursive(right_arr)
+    
+    comp_count += comp_left + comp_right
+    assign_count += assign_left + assign_right
+    recursive_calls += calls_left + calls_right  
+    
+    # Зливаємо відсортовані половини
+    merged_arr, comp_merge, assign_merge = merge(sorted_left, sorted_right)
+    comp_count += comp_merge
+    assign_count += assign_merge
+    
+    return merged_arr, comp_count, assign_count, recursive_calls
+
+def merge(left, right):
+
+    result = []
+    comp_count = 0
+    assign_count = 0
+    i = j = 0
+    
+    # Зливаємо елементи з обох масивів з порівнянням
+    while i < len(left) and j < len(right):
+        comp_count += 1
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+        assign_count += 1
+    
+    # Додаємо залишкові елементи з лівого масиву
+    while i < len(left):
+        result.append(left[i])
+        i += 1
+        assign_count += 1
+    
+    # Додаємо залишкові елементи з правого масиву
+    while j < len(right):
+        result.append(right[j])
+        j += 1
+        assign_count += 1
+    
+    return result, comp_count, assign_count
+
+
+numbers = [11, 42, 67, 55, 65, 78, 25, 50, 69]
+print("Вхідний масив:", numbers)
+
+sorted_numbers, comparisons, assignments, recursive_calls = merge_sort_recursive(numbers)
+print("Відсортований масив:", sorted_numbers)
+print(f"Загальна кількість порівнянь: {comparisons}")
+print(f"Загальна кількість присвоювань: {assignments}")
+print(f"Загальна кількість рекурсивних викликів: {recursive_calls}")
