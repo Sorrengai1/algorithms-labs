@@ -1,0 +1,65 @@
+comparisons = 0
+swaps = 0
+assignments = 0
+
+def swap(arr, i, j):
+    global swaps, assignments
+    arr[i], arr[j] = arr[j], arr[i]
+    swaps += 1
+    assignments += 3
+
+def sink(arr, i, n):
+    global comparisons, assignments
+    k = i
+    assignments += 1
+    while True:
+        j = 2 * k + 1
+        assignments += 1
+        
+        if j >= n:
+            break
+
+        if j + 1 < n:
+            comparisons += 1  # arr[j+1] > arr[j]
+            if arr[j + 1] > arr[j]:
+                j += 1
+                assignments += 1
+
+        comparisons += 1  # arr[k] >= arr[j]
+        if arr[k] >= arr[j]:
+            break
+
+        swap(arr, k, j)
+        k = j
+        assignments += 1
+
+def heapsort(arr):
+    global comparisons, swaps, assignments
+    comparisons = 0
+    swaps = 0
+    assignments = 0
+    
+    n = len(arr)
+    assignments += 1
+    
+    # Фаза 1
+    for i in range(n // 2 - 1, -1, -1):
+        assignments += 1
+        sink(arr, i, n)
+    
+    # Фаза 2
+    for i in range(n - 1, 0, -1):
+        assignments += 1
+        swap(arr, 0, i)
+        sink(arr, 0, i)
+    
+    return arr
+
+A = [11, 42, 67, 55, 65, 78, 25, 50, 69]
+sorted_A = heapsort(A)
+
+print(f"Відсортований масив: {sorted_A}")
+print(f"Порівнянь: {comparisons}")
+print(f"Обмінів: {swaps}") 
+print(f"Присвоювань: {assignments}")
+print(f"Загальна кількість операцій: {comparisons + assignments}")
