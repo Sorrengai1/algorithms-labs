@@ -1,0 +1,100 @@
+from math import floor
+from collections import defaultdict
+
+M = 13
+
+WORDS = ["Не", "все", "те", "робота", "що", "руки", "роблять", 
+          "голова", "має", "знати", "що", "робити"]
+
+LETTER_POSITIONS = {
+    'А': 1, 'Б': 2, 'В': 3, 'Г': 4, 'Ґ': 5, 'Д': 6, 'Е': 7, 'Є': 8, 'Ж': 9, 'З': 10, 
+    'И': 11, 'І': 12, 'Ї': 13, 'Й': 14, 'К': 15, 'Л': 16, 'М': 17, 'Н': 18, 'О': 19, 
+    'П': 20, 'Р': 21, 'С': 22, 'Т': 23, 'У': 24, 'Ф': 25, 'Х': 26, 'Ц': 27, 'Ч': 28, 
+    'Ш': 29, 'Щ': 30, 'Ь': 31, 'Ю': 32, 'Я': 33,
+    'а': 1, 'б': 2, 'в': 3, 'г': 4, 'ґ': 5, 'д': 6, 'е': 7, 'є': 8, 'ж': 9, 'з': 10, 
+    'и': 11, 'і': 12, 'ї': 13, 'й': 14, 'к': 15, 'л': 16, 'м': 17, 'н': 18, 'о': 19, 
+    'п': 20, 'р': 21, 'с': 22, 'т': 23, 'у': 24, 'ф': 25, 'х': 26, 'ц': 27, 'ч': 28, 
+    'ш': 29, 'щ': 30, 'ь': 31, 'ю': 32, 'я': 33
+}
+
+# --- Хеш-функції ---
+def simple_hash_from_map(key: str) -> int:
+    """Метод ділення: h(K) = K mod 13"""
+    sum_of_positions = sum(LETTER_POSITIONS.get(c, 0) for c in key)
+    return sum_of_positions % M
+
+def hash_multiplication(key: str) -> int:
+    """Метод множення: h(K) = ⌊16 * (k*A mod 1)⌋ mod M"""
+    A = 0.6180339887
+    k = sum(LETTER_POSITIONS.get(c, 0) for c in key)
+    fractional_part = (k * A) % 1
+    hash_value = int(16 * fractional_part)
+    return hash_value % M
+
+# --- Побудова хеш-таблиці з ланцюжками ---
+def build_open_hash_table(words: list, m: int, method='division') -> list:
+    table = [[] for _ in range(m)]
+    for word in words:
+        if method == 'division':
+            address = simple_hash_from_map(word)
+        else:
+            address = hash_multiplication(word)
+        table[address].append(word)
+    return table
+
+# --- Вивід таблиці ---
+def display_hash_table(table: list, title=""):
+    print(f"\n{title}")
+    print("Індекс | Ланцюжок")
+    print("-------|-----------------------------")
+    for i, chain in enumerate(table):
+        print(f"{i:02d}     | {chain}")
+
+# --- Підрахунок порівнянь ---
+def calculate_chain_stats(table, words, hash_func):
+    comparisons = []
+    occurrences = defaultdict(int)
+
+    for w in words:
+        occurrences[w] += 1
+        occ = occurrences[w]
+        idx = hash_func(w)
+        chain = table[idx]
+
+        # Рахуємо позицію елемента у своєму ланцюжку (це і є кількість порівнянь)
+        occ_in_chain = 0
+        pos = 0
+        for i, item in enumerate(chain, start=1):
+            if item == w:
+                occ_in_chain += 1
+                if occ_in_chain == occ:
+                    pos = i
+                    break
+        comparisons.append((w, occ, idx, pos))
+
+    avg = sum(p for (_,_,_,p) in comparisons) / len(comparisons)
+    max_item = max(comparisons, key=lambda x: x[3])
+    return comparisons, avg, max_item
+
+# --- Виконання ---
+print("*** МЕТОД ДІЛЕННЯ (ланцюжки) ***")
+hash_table_division = build_open_hash_table(WORDS, M, 'division')
+display_hash_table(hash_table_division, "Таблиця 4.7 — Результат методом ділення")
+
+div_comps, div_avg, div_max = calculate_chain_stats(hash_table_division, WORDS, simple_hash_from_map)
+print("\nПорівняння (метод ділення):")
+for w, occ, idx, c in div_comps:
+    print(f"{w}#{occ} → bucket={idx}, comparisons={c}")
+print(f"Середня кількість порівнянь: {div_avg:.3f}")
+print(f"Максимум: {div_max[0]}#{div_max[1]} → bucket={div_max[2]}, comparisons={div_max[3]}")
+
+print("\n\n*** МЕТОД МНОЖЕННЯ (ланцюжки) ***")
+hash_table_mult = build_open_hash_table(WORDS, M, 'multiplication')
+display_hash_table(hash_table_mult, "Таблиця 4.8 — Результат методом множення")
+
+mul_comps, mul_avg, mul_max = calculate_chain_stats(hash_table_mult, WORDS, hash_multiplication)
+print("\nПорівняння (метод множення):")
+for w, occ, idx, c in mul_comps:
+    print(f"{w}#{occ} → bucket={idx}, comparisons={c}")
+print(f"Середня кількість порівнянь: {mul_avg:.3f}")
+print(f"Максимум: {mul_max[0]}#{mul_max[1]} → bucket={mul_max[2]}, comparisons={mul_max[3]}")
