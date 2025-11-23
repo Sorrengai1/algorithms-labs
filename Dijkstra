@@ -1,0 +1,63 @@
+import heapq
+
+def dijkstra(G, s):
+    n = len(G)
+    pred = [-1] * n
+    dist = [float('inf')] * n
+    pq = []
+    
+    for v in range(n):
+        pred[v] = -1
+        if v != s:
+            dist[v] = float('inf')
+        else:
+            dist[v] = 0
+        heapq.heappush(pq, (dist[v], v))
+    
+    while pq:
+        current_dist, u = heapq.heappop(pq)
+        if current_dist > dist[u]:
+            continue
+            
+        for neighbor_data in G[u]:
+            v, weight = neighbor_data
+            if dist[v] > dist[u] + weight:
+                dist[v] = dist[u] + weight
+                pred[v] = u
+                heapq.heappush(pq, (dist[v], v))
+    
+    return pred, dist
+
+def reconstruct_path(pred, target):
+    path = []
+    current = target
+    while current != -1:
+        path.append(current)
+        current = pred[current]
+    return path[::-1]
+
+
+graph = [
+    [(2, 6), (3, 7), (5, 8)],  
+    [(2, 1), (3, 3), (5, 2), (6, 4)],  
+    [(0, 6), (1, 1), (7, 7)],    
+    [(0, 7), (1, 3), (4, 9)],    
+    [(3, 9), (6, 5)],            
+    [(0, 8), (1, 2), (7, 3)],    
+    [(1, 4), (4, 5), (7, 4)],    
+    [(2, 7), (5, 3), (6, 4)]     
+]
+
+start_vertex = 0  # Вершина 1
+pred, dist = dijkstra(graph, start_vertex)
+
+print("Найкоротші шляхи з вершини 1:")
+print("Вершина | Відстань | Шлях")
+print("-" * 30)
+
+for i in range(len(dist)):
+    if i == start_vertex:
+        continue
+    path = reconstruct_path(pred, i)
+    path_str = "→".join(str(x + 1) for x in path)
+    print(f"1 → {i + 1} | {int(dist[i]):8} | {path_str}")
