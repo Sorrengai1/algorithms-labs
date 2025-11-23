@@ -1,0 +1,56 @@
+class Graph:
+    def __init__(self, vertices):
+        self.V = vertices
+        self.graph = []
+        self.T = []
+        self.parent = [i for i in range(vertices)]
+    
+    def add_weighted_edge(self, u, v, w):
+        self.graph.append([w, u, v])
+    
+    def find_set(self, i):
+        if self.parent[i] == i:
+            return i
+        return self.find_set(self.parent[i])
+    
+    def union_set(self, u, v):
+        self.parent[u] = self.parent[v]
+    
+    def kruskal(self):
+        self.graph.sort()
+        
+        for i in range(len(self.graph)):
+            w, u, v = self.graph[i]
+            uRep = self.find_set(u)
+            vRep = self.find_set(v)
+            
+            if uRep != vRep:
+                self.T.append([u, v, w])
+                self.union_set(uRep, vRep)
+    
+    def print_result(self):
+        print("Edge : Weight")
+        total_weight = 0
+        for u, v, weight in self.T:
+            print(f"{u+1} - {v+1} : {weight}")
+            total_weight += weight
+        print(f"Загальна вага: {total_weight}")
+
+# Створення графа варіанту 25
+g = Graph(8)
+
+g.add_weighted_edge(0, 5, 1)  # 1-6
+g.add_weighted_edge(1, 2, 1)  # 2-3
+g.add_weighted_edge(5, 1, 2)  # 6-2
+g.add_weighted_edge(1, 3, 3)  # 2-4
+g.add_weighted_edge(5, 7, 3)  # 6-8
+g.add_weighted_edge(1, 6, 4)  # 2-7
+g.add_weighted_edge(7, 6, 4)  # 8-7
+g.add_weighted_edge(6, 4, 5)  # 7-5
+g.add_weighted_edge(0, 2, 6)  # 1-3
+g.add_weighted_edge(0, 3, 7)  # 1-4
+g.add_weighted_edge(2, 7, 7)  # 3-8
+g.add_weighted_edge(3, 4, 9)  # 4-5
+
+g.kruskal()
+g.print_result()
